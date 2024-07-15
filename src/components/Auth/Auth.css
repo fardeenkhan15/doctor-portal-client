@@ -1,0 +1,99 @@
+body{
+  margin: 0 0 0 0;
+}
+
+.doctor-login-container {
+  display: flex;
+  height: 100vh;
+  background-color: #1c1e21;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  background-color: #1c1e21;
+  color: white;
+  width: 50%;
+}
+
+.image-section {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.logo-container {
+  margin-bottom: 2rem;
+}
+
+.logo {
+  width: 150px;
+}
+
+h2 {
+  margin-bottom: 0.5rem;
+}
+
+p {
+  margin-bottom: 2rem;
+  color: #ccc;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #ccc;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #2d2f31;
+  color: #ccc;
+}
+
+input::placeholder {
+  color: #777;
+}
+
+button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #218838;
+}
+.signup-link, .login-link, .patient-link, .doctor-link {
+  margin-top: 1rem;
+  color: #ccc;
+}
+
+.signup-link a, .login-link a, .patient-link a, .doctor-link a {
+  color: #28a745;
+  text-decoration: none;
+}
+
+.signup-link a:hover, .login-link a:hover, .patient-link a:hover, .doctor-link a:hover {
+  text-decoration: underline;
+}
+
+

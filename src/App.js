@@ -13,7 +13,6 @@ import Footer from './components/UI/Footer';
 function App() {
   return (
     <Router>
-      <Navbar />
       <Routes>
         <Route path="/doctor/login" element={<DoctorLogin />} />
         <Route path="/doctor/signup" element={<DoctorSignup />} />
@@ -23,7 +22,7 @@ function App() {
         <Route path="/upload-pdf" element={<PDFUpload />} />
         <Route path="/link-patient" element={<PatientLinking />} />
       </Routes>
-      <Footer />
+      
     </Router>
   );
 }
