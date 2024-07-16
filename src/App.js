@@ -7,8 +7,6 @@ import PatientSignup from './components/Auth/PatientSignup';
 import Dashboard from './components/Dashboard/Dashboard';
 import PDFUpload from './components/Dashboard/PDFUpload';
 import PatientLinking from './components/Dashboard/PatientLinking';
-import Navbar from './components/UI/Navbar';
-import Footer from './components/UI/Footer';
 
 function App() {
   return (
