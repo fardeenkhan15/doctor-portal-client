@@ -20,7 +20,6 @@ function App() {
         <Route path="/upload-pdf" element={<PDFUpload />} />
         <Route path="/link-patient" element={<PatientLinking />} />
       </Routes>
-      
     </Router>
   );
 }

@@ -34,8 +34,8 @@ const DoctorSignup = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="flex flex-col justify-center flex-1 px-8 py-4 bg-gray-800">
+    <div className="flex h-screen bg-[#131619]">
+      <div className="flex flex-col justify-center flex-1 px-8 py-4 bg-[#131619]">
         <div className="mb-3">
           <img src={logo} alt="CarePulse Logo" className="h-10" />
         </div>
