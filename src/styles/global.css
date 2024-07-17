@@ -78,3 +78,50 @@
   {
   background-color: #0056b3;
   } */
+
+  /* custom-ag-theme.css */
+.ag-theme-black {
+  --ag-background-color: #000000;
+  --ag-header-background-color: #1a1a1a;
+  --ag-odd-row-background-color: #1a1a1a;
+  --ag-row-hover-color: #333333;
+  --ag-border-color: #333333;
+  --ag-font-color: #ffffff;
+  --ag-secondary-font-color: #ffffff;
+}
+
+.ag-theme-black .ag-root-wrapper {
+  background-color: var(--ag-background-color);
+}
+
+.ag-theme-black .ag-header {
+  background-color: var(--ag-header-background-color);
+  color: var(--ag-font-color);
+}
+
+.ag-theme-black .ag-row {
+  background-color: var(--ag-odd-row-background-color);
+  color: var(--ag-font-color);
+}
+
+.ag-theme-black .ag-row-hover {
+  background-color: var(--ag-row-hover-color);
+}
+
+.ag-theme-black .ag-cell {
+  border-bottom: 1px solid var(--ag-border-color);
+  color: var(--ag-font-color);
+}
+
+.ag-theme-black .ag-cell-value {
+  color: var(--ag-font-color);
+}
+
+.ag-theme-black .ag-paging-panel {
+  background-color: var(--ag-header-background-color);
+  color: var(--ag-font-color);
+}
+
+.ag-theme-black .ag-icon {
+  color: var(--ag-font-color);
+}
