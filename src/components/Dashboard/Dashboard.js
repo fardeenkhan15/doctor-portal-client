@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import logo from '../../assets/icons/logo-full.svg';
 import AdminProfile from '../../assets/images/admin.png';
+import AddPatientModal from './AddPatientModal';
+import './App.css';
 
 const Dashboard = () => {
-  const rowData = [
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [rowData, setRowData] = useState([
     { id: 1, name: 'Phoenix Baker', date: 'Jan 4, 2022', status: 'Scheduled', doctor: 'Dr. Alex Ramirez' },
     { id: 2, name: 'Candice Wu', date: 'Jan 2, 2022', status: 'Pending', doctor: 'Dr. Michael May' },
     { id: 3, name: 'Lana Steiner', date: 'Jan 4, 2022', status: 'Cancelled', doctor: 'Dr. Jasmine Lee' },
     { id: 4, name: 'Drew Cano', date: 'Jan 8, 2022', status: 'Scheduled', doctor: 'Dr. Hardik Sharma' },
     { id: 5, name: 'Natali Craig', date: 'Jan 6, 2022', status: 'Pending', doctor: 'Dr. Alyana Cruz' },
-  ];
+  ]);
+
+  const navigate = useNavigate();
 
   const columnDefs = [
     { headerName: 'Patient', field: 'name' },
@@ -31,7 +37,26 @@ const Dashboard = () => {
   ];
 
   const viewPatientDetails = (id) => {
-    console.log(`View details for patient with ID: ${id}`);
+    navigate(`/doctor/patient/${id}`);
+  };
+
+  const availablePatients = [
+    { id: 1, name: 'John Doe', problem: 'Flu' },
+    { id: 2, name: 'Jane Smith', problem: 'Cough' },
+    { id: 3, name: 'Michael Brown', problem: 'Fever' },
+  ];
+
+  const linkPatient = (patientId) => {
+    const patient = availablePatients.find(p => p.id === parseInt(patientId));
+    const newPatient = {
+      id: rowData.length + 1,
+      name: patient.name,
+      date: 'Jan 10, 2022', // Or any date you want
+      status: 'Scheduled',
+      doctor: 'Dr. New Doctor', // Or any doctor you want
+    };
+    setRowData([...rowData, newPatient]);
+    setModalIsOpen(false);
   };
 
   return (
@@ -46,7 +71,10 @@ const Dashboard = () => {
       </nav>
       
       <div className="p-6">
-        <h2 className="text-3xl mb-4">Welcome, Admin</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-3xl">Welcome, Admin</h2>
+          <button onClick={() => setModalIsOpen(true)} className="bg-blue-500 p-2 rounded">Add Patient</button>
+        </div>
         <p className="mb-4">Start day with managing new appointments</p>
 
         <div className="summary-cards flex justify-between mb-4">
@@ -71,6 +99,13 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      <AddPatientModal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        availablePatients={availablePatients}
+        linkPatient={linkPatient}
+      />
     </div>
   );
 };

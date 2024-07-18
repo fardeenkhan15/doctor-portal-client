@@ -6,7 +6,7 @@ import PatientLogin from './components/Auth/PatientLogin';
 import PatientSignup from './components/Auth/PatientSignup';
 import Dashboard from './components/Dashboard/Dashboard';
 import PDFUpload from './components/Dashboard/PDFUpload';
-import PatientLinking from './components/Dashboard/PatientLinking';
+import PatientDashboard from './components/Dashboard/PatientDashboard';
 
 function App() {
   return (
@@ -17,8 +17,9 @@ function App() {
         <Route path="/patient/login" element={<PatientLogin />} />
         <Route path="/patient/signup" element={<PatientSignup />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/doctor/patient/:patientId" element={<PatientDashboard userType="doctor" />} />
+        <Route path="/patient/patient/:patientId" element={<PatientDashboard userType="patient" />} />
         <Route path="/upload-pdf" element={<PDFUpload />} />
-        <Route path="/link-patient" element={<PatientLinking />} />
       </Routes>
     </Router>
   );
