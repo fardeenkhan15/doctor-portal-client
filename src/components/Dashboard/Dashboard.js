@@ -6,30 +6,27 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import logo from '../../assets/icons/logo-full.svg';
 import AdminProfile from '../../assets/images/admin.png';
 import AddPatientModal from './AddPatientModal';
+import { patients } from './mockData'; // Import the mock data
 import './App.css';
 
 const Dashboard = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [rowData, setRowData] = useState([
-    { id: 1, name: 'Phoenix Baker', date: 'Jan 4, 2022', status: 'Scheduled', doctor: 'Dr. Alex Ramirez' },
-    { id: 2, name: 'Candice Wu', date: 'Jan 2, 2022', status: 'Pending', doctor: 'Dr. Michael May' },
-    { id: 3, name: 'Lana Steiner', date: 'Jan 4, 2022', status: 'Cancelled', doctor: 'Dr. Jasmine Lee' },
-    { id: 4, name: 'Drew Cano', date: 'Jan 8, 2022', status: 'Scheduled', doctor: 'Dr. Hardik Sharma' },
-    { id: 5, name: 'Natali Craig', date: 'Jan 6, 2022', status: 'Pending', doctor: 'Dr. Alyana Cruz' },
-  ]);
+  const [rowData, setRowData] = useState(patients); // Use the mock data
 
   const navigate = useNavigate();
 
   const columnDefs = [
-    { headerName: 'Patient', field: 'name' },
-    { headerName: 'Date', field: 'date' },
-    { headerName: 'Status', field: 'status' },
-    { headerName: 'Doctor', field: 'doctor' },
+    { headerName: 'Name', field: 'name' },
+    { headerName: 'Email', field: 'email' },
+    { headerName: 'Age', field: 'age' },
     {
       headerName: 'Actions',
       field: 'id',
       cellRendererFramework: (params) => (
-        <button className="bg-blue-500 p-1 rounded" onClick={() => viewPatientDetails(params.value)}>
+        <button
+          className="bg-blue-500 p-1 rounded"
+          onClick={() => viewPatientDetails(params.data.id)}
+        >
           View
         </button>
       ),
@@ -41,9 +38,9 @@ const Dashboard = () => {
   };
 
   const availablePatients = [
-    { id: 1, name: 'John Doe', problem: 'Flu' },
-    { id: 2, name: 'Jane Smith', problem: 'Cough' },
-    { id: 3, name: 'Michael Brown', problem: 'Fever' },
+    { id: 1, name: 'John Doe', email: 'john@example.com', age: 30 },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', age: 25 },
+    { id: 3, name: 'Michael Brown', email: 'michael@example.com', age: 35 },
   ];
 
   const linkPatient = (patientId) => {
@@ -51,9 +48,8 @@ const Dashboard = () => {
     const newPatient = {
       id: rowData.length + 1,
       name: patient.name,
-      date: 'Jan 10, 2022', // Or any date you want
-      status: 'Scheduled',
-      doctor: 'Dr. New Doctor', // Or any doctor you want
+      email: patient.email,
+      age: patient.age,
     };
     setRowData([...rowData, newPatient]);
     setModalIsOpen(false);

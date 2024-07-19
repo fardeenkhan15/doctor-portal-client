@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DoctorLogin from './components/Auth/DoctorLogin';
 import DoctorSignup from './components/Auth/DoctorSignup';
@@ -7,8 +7,11 @@ import PatientSignup from './components/Auth/PatientSignup';
 import Dashboard from './components/Dashboard/Dashboard';
 import PDFUpload from './components/Dashboard/PDFUpload';
 import PatientDashboard from './components/Dashboard/PatientDashboard';
+import AddPatientModal from './components/Dashboard/AddPatientModal';
 
 function App() {
+  const [patients, setPatients] = useState([]);
+
   return (
     <Router>
       <Routes>
@@ -20,6 +23,7 @@ function App() {
         <Route path="/doctor/patient/:patientId" element={<PatientDashboard userType="doctor" />} />
         <Route path="/patient/patient/:patientId" element={<PatientDashboard userType="patient" />} />
         <Route path="/upload-pdf" element={<PDFUpload />} />
+        <Route path="/add-patient-modal" element={<AddPatientModal patients={patients} />} />
       </Routes>
     </Router>
   );

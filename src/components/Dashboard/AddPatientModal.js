@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-modal';
 
-Modal.setAppElement('#root');
+const AddPatientModal = ({ isOpen, onRequestClose, availablePatients, linkPatient }) => {
+  const [selectedPatient, setSelectedPatient] = useState('');
 
-const AddPatientModal = ({ isOpen, onRequestClose, patients, linkPatient }) => {
-  const [selectedPatient, setSelectedPatient] = React.useState('');
+  const handlePatientChange = (e) => {
+    setSelectedPatient(e.target.value);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,27 +18,24 @@ const AddPatientModal = ({ isOpen, onRequestClose, patients, linkPatient }) => {
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Add Patient Modal"
-      className="modal-content"
-      overlayClassName="modal-overlay"
+      ariaHideApp={false}
     >
-      <h2 className="text-2xl mb-4">Link Patient</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <label>Available Patients:</label>
-        <select
-          value={selectedPatient}
-          onChange={(e) => setSelectedPatient(e.target.value)}
-          required
-          className="text-black p-2 rounded"
-        >
-          <option value="" disabled>Select a patient</option>
-          {patients.map((patient) => (
-            <option key={patient.id} value={patient.id}>
-              {patient.name} - {patient.problem}
-            </option>
-          ))}
-        </select>
-        <button type="submit" className="bg-blue-500 p-2 rounded">Link</button>
+      <h2>Add Patient</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Select Patient:
+          <select value={selectedPatient} onChange={handlePatientChange}>
+            <option value="">Select a patient</option>
+            {availablePatients.map((patient) => (
+              <option key={patient.id} value={patient.id}>
+                {patient.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="submit">Link Patient</button>
       </form>
+      <button onClick={onRequestClose}>Close</button>
     </Modal>
   );
 };
