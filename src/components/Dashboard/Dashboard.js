@@ -1,30 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import logo from '../../assets/icons/logo-full.svg';
 import AdminProfile from '../../assets/images/admin.png';
 import AddPatientModal from './AddPatientModal';
-import { patients } from './mockData'; // Import the mock data
+import { getPatientsByDoctor, getAvailablePatients, linkPatientToDoctor, getPDFsByDoctorId } from '../../services/api';
 import './App.css';
 
 const Dashboard = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [rowData, setRowData] = useState(patients); // Use the mock data
-
+  const [rowData, setRowData] = useState([]);
+  const [availablePatients, setAvailablePatients] = useState(0);
+  const [totalPDFs, setTotalPDFs] = useState(0);
   const navigate = useNavigate();
+  const doctorId = localStorage.getItem('doctorId');
 
   const columnDefs = [
-    { headerName: 'Name', field: 'name' },
-    { headerName: 'Email', field: 'email' },
-    { headerName: 'Age', field: 'age' },
+    { headerName: 'Name', field: 'name', flex: 1 },
+    { headerName: 'Email', field: 'email', flex: 1 },
+    { headerName: 'Age', field: 'age', flex: 1 },
     {
       headerName: 'Actions',
       field: 'id',
-      cellRendererFramework: (params) => (
+      flex: 1,
+      cellRenderer: (params) => (
         <button
-          className="bg-blue-500 p-1 rounded"
+          className="bg-blue-500 p-1 rounded text-white"
           onClick={() => viewPatientDetails(params.data.id)}
         >
           View
@@ -37,36 +42,82 @@ const Dashboard = () => {
     navigate(`/doctor/patient/${id}`);
   };
 
-  const availablePatients = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', age: 30 },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', age: 25 },
-    { id: 3, name: 'Michael Brown', email: 'michael@example.com', age: 35 },
-  ];
+  const fetchPatients = useCallback(async () => {
+    try {
+      const patients = await getPatientsByDoctor(doctorId);
+      setRowData(patients);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        console.error('Unauthorized access - redirecting to login');
+        navigate('/doctor/login');
+      } else {
+        console.error('An error occurred while fetching patients', error);
+      }
+    }
+  }, [doctorId, navigate]);
 
-  const linkPatient = (patientId) => {
-    const patient = availablePatients.find(p => p.id === parseInt(patientId));
-    const newPatient = {
-      id: rowData.length + 1,
-      name: patient.name,
-      email: patient.email,
-      age: patient.age,
-    };
-    setRowData([...rowData, newPatient]);
-    setModalIsOpen(false);
+  const fetchAvailablePatients = useCallback(async () => {
+    try {
+      const patients = await getAvailablePatients();
+      setAvailablePatients(patients.length);
+    } catch (error) {
+      console.error('An error occurred while fetching available patients', error);
+    }
+  }, []);
+
+  const fetchTotalPDFs = useCallback(async () => {
+    try {
+      const pdfs = await getPDFsByDoctorId(doctorId);
+      setTotalPDFs(pdfs.length);
+    } catch (error) {
+      console.error('An error occurred while fetching PDFs', error);
+    }
+  }, [doctorId]);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/doctor/login');
+    } else {
+      fetchPatients();
+      fetchAvailablePatients();
+      fetchTotalPDFs();
+    }
+  }, [fetchPatients, fetchAvailablePatients, fetchTotalPDFs, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('doctorId');
+    navigate('/doctor/login');
+  };
+
+  const handleLinkPatient = async (patientId) => {
+    try {
+      await linkPatientToDoctor(patientId);
+      toast.success('Patient linked successfully');
+      fetchPatients();
+      fetchAvailablePatients();
+    } catch (error) {
+      console.error('Error linking patient:', error);
+      toast.error('Failed to link patient');
+    }
   };
 
   return (
-    <div className="bg-[#131619] text-white p-6 gap-6 w-full h-full mx-auto overflow-hidden">
+    <div className="bg-[#131619] text-white p-6 gap-6 w-full h-screen mx-auto overflow-hidden flex flex-col">
+      <ToastContainer />
       <nav className="flex items-center rounded-t-2xl rounded-b-2xl justify-between p-4 bg-black">
         <img src={logo} alt="CarePulse Logo" className="h-10" />
         <div className="flex items-center">
           <div className="relative">
             <img src={AdminProfile} alt="Admin Profile" className="h-10 w-10 rounded-full" />
           </div>
+          <button onClick={handleLogout} className="ml-4 bg-red-500 p-2 rounded text-white">Logout</button>
         </div>
       </nav>
       
-      <div className="p-6">
+      <div className="flex-grow flex flex-col overflow-hidden">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-3xl">Welcome, Admin</h2>
           <button onClick={() => setModalIsOpen(true)} className="bg-blue-500 p-2 rounded">Add Patient</button>
@@ -76,22 +127,29 @@ const Dashboard = () => {
         <div className="summary-cards flex justify-between mb-4">
           <div className="bg-gray-800 p-3 rounded-lg text-center flex-1 mx-2">
             <h3 className="text-lg">Total number of linked patients</h3>
-            <p className="text-2xl">5</p>
+            <p className="text-2xl">{rowData.length}</p>
           </div>
           <div className="bg-gray-800 p-3 rounded-lg text-center flex-1 mx-2">
             <h3 className="text-lg">Total number of patients available</h3>
-            <p className="text-2xl">32</p>
+            <p className="text-2xl">{availablePatients}</p>
           </div>
           <div className="bg-gray-800 p-3 rounded-lg text-center flex-1 mx-2">
             <h3 className="text-lg">Total number of PDFs uploaded</h3>
-            <p className="text-2xl">56</p>
+            <p className="text-2xl">{totalPDFs}</p>
           </div>
         </div>
 
-        <div className="patient-table mb-4">
+        <div className="patient-table flex-grow overflow-hidden">
           <h3 className="text-2xl mb-2">Linked Patients</h3>
-          <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
-            <AgGridReact rowData={rowData} columnDefs={columnDefs} pagination={true} paginationPageSize={10} />
+          <div className="ag-theme-alpine-dark h-full w-full">
+            <AgGridReact 
+              rowData={rowData} 
+              columnDefs={columnDefs} 
+              pagination={true} 
+              paginationPageSize={10} 
+              paginationPageSizeSelector={[10, 20, 50, 100]}
+              domLayout='autoHeight'
+            />
           </div>
         </div>
       </div>
@@ -99,8 +157,8 @@ const Dashboard = () => {
       <AddPatientModal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
-        availablePatients={availablePatients}
-        linkPatient={linkPatient}
+        fetchPatients={fetchPatients}
+        onLinkPatient={handleLinkPatient}
       />
     </div>
   );

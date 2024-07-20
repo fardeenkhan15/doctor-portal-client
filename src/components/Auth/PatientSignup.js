@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import loginImage from '../../assets/images/onboarding-img.png';
 import logo from '../../assets/icons/logo-full.svg';
+import { signupPatient } from '../../services/api';
 
 const PatientSignup = () => {
   const [step, setStep] = useState(1);
@@ -15,6 +18,8 @@ const PatientSignup = () => {
     currentProblems: ''
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -32,19 +37,30 @@ const PatientSignup = () => {
       if (!formData.age) newErrors.age = 'Age is required';
       if (!formData.address) newErrors.address = 'Address is required';
     }
-    // Add more validations for other steps if needed
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
       if (step === 3) {
-        // Submit the form
-        console.log(formData);
+        setLoading(true);
+        try {
+          await signupPatient(formData);
+          console.log('Signup successful');
+          toast.success('Signup successful! Please log in.');
+          setTimeout(() => {
+            navigate('/patient/login');
+          }, 2000);
+        } catch (error) {
+          console.error(error);
+          toast.error('Signup failed. Please try again.');
+        } finally {
+          setLoading(false);
+        }
       } else {
         setErrors({});
         setStep(step + 1);
@@ -58,6 +74,7 @@ const PatientSignup = () => {
 
   return (
     <div className="flex h-screen bg-[#131619]">
+      <ToastContainer/>
       <div className="flex flex-col justify-center flex-1 px-8 py-4 bg-[#131619]">
         <div className="mb-3">
           <img src={logo} alt="CarePulse Logo" className="h-10" />
@@ -161,7 +178,7 @@ const PatientSignup = () => {
             {step > 1 && (
               <button type="button" onClick={handleBack} className="px-4 py-2 mt-0 text-white bg-gray-500 rounded">Back</button>
             )}
-            <button type="submit" className="px-4 py-2 mt-0 text-white bg-green-500 rounded">
+            <button type="submit" className="px-4 py-2 mt-0 text-white bg-green-500 rounded" disabled={loading}>
               {step === 3 ? 'Sign Up' : 'Next'}
             </button>
           </div>

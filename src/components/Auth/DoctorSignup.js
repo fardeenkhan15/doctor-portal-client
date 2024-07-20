@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import loginImage from '../../assets/images/onboarding-img.png'; // Adjust the path according to your folder structure
+import { Link, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import loginImage from '../../assets/images/onboarding-img.png';
 import logo from '../../assets/icons/logo-full.svg';
+import { signupDoctor } from '../../services/api';
 
 const DoctorSignup = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', specialty: '' });
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -22,19 +27,28 @@ const DoctorSignup = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      // Submit the form
-      console.log(formData);
+      try {
+        await signupDoctor(formData);
+        toast.success('Signup successful! Please log in.');
+        setTimeout(() => {
+          navigate('/doctor/login');
+        }, 2000);
+      } catch (error) {
+        setServerError(error.response?.data?.error || 'Signup failed');
+        toast.error('Signup failed. Please try again.');
+      }
     }
   };
 
   return (
     <div className="flex h-screen bg-[#131619]">
+      <ToastContainer/>
       <div className="flex flex-col justify-center flex-1 px-8 py-4 bg-[#131619]">
         <div className="mb-3">
           <img src={logo} alt="CarePulse Logo" className="h-10" />
@@ -91,6 +105,7 @@ const DoctorSignup = () => {
             {errors.specialty && <p className="mt-2 text-sm text-red-500">{errors.specialty}</p>}
           </div>
           <button type="submit" className="w-full px-4 py-2 mt-0 text-white bg-green-500 rounded">Sign Up</button>
+          {serverError && <p className="mt-2 text-sm text-red-500">{serverError}</p>}
         </form>
         <div className="flex justify-between text-sm text-green-500">
           <Link to="/doctor/login">Already have an account? Log in</Link>
